@@ -1,0 +1,33 @@
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local contentProvider = game:GetService("ContentProvider")
+local ts = game:GetService("TweenService")
+local loadingScreenUI = script:WaitForChild("loadingScreen"):Clone()
+
+repeat wait() until game:IsLoaded()
+
+local function beginLoad()
+	local gameAssets = game:GetDescendants()
+	local totalAssets = #gameAssets
+	loadingScreenUI:WaitForChild("background"):WaitForChild("TextLabel").Text = "[ 0/"..totalAssets.." ]"
+	for i,v in gameAssets do
+		contentProvider:PreloadAsync({v})
+		loadingScreenUI:WaitForChild("background"):WaitForChild("TextLabel").Text = "[ "..i.."/"..totalAssets.." ]"
+	end
+end
+
+loadingScreenUI.Parent = playerGui
+ts:Create(loadingScreenUI.background,TweenInfo.new(2),{BackgroundColor3 = Color3.fromRGB(168, 17, 255)}):Play()
+task.wait(2);
+beginLoad()
+task.wait(2);
+local colorOutAnim = ts:Create(loadingScreenUI.background,TweenInfo.new(2),{BackgroundColor3 = Color3.fromRGB(0, 0, 0)})
+local fadeOutAnim = ts:Create(loadingScreenUI.background,TweenInfo.new(2),{BackgroundTransparency = 1})
+
+colorOutAnim:Play()
+colorOutAnim.Completed:Wait()
+loadingScreenUI.bars:Destroy()
+loadingScreenUI.background.TextLabel:Destroy()
+fadeOutAnim:Play()
+fadeOutAnim.Completed:Wait()
+loadingScreenUI:Destroy()
