@@ -1,0 +1,48 @@
+
+--[[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local teleportEvent = ReplicatedStorage:WaitForChild("TeleportRequest")
+
+teleportEvent.OnServerEvent:Connect(function(player, destinationName)
+	local character = player.Character
+	if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+	-- Find the teleport point in Workspace by name
+	local teleportPart = workspace:FindFirstChild(destinationName)
+
+	-- Check if it's a valid Part
+	if teleportPart and teleportPart:IsA("BasePart") then
+		-- Move the player slightly above the part to avoid getting stuck inside
+		character.HumanoidRootPart.CFrame = teleportPart.CFrame + Vector3.new(0, 5, 0)
+	else
+		warn("Teleport failed: No valid part named", destinationName)
+	end
+end)--]]
+-- Script in ServerScriptService
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local teleportEvent = ReplicatedStorage:WaitForChild("TeleportRequest")
+
+teleportEvent.OnServerEvent:Connect(function(player, destinationName)
+	if not destinationName then
+		warn("TeleportRequest received without destinationName from", player.Name)
+		return
+	end
+
+	local character = player.Character
+	if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+	-- Look inside the 'TeleportPoints' model
+	local teleportModel = workspace:FindFirstChild("TeleportPoints")
+	if not teleportModel then
+		warn("TeleportPoints model not found in Workspace")
+		return
+	end
+
+	local teleportPart = teleportModel:FindFirstChild(destinationName)
+	if teleportPart and teleportPart:IsA("BasePart") then
+		character.HumanoidRootPart.CFrame = teleportPart.CFrame + Vector3.new(0, 5, 0)
+	else
+		warn("Teleport failed: No valid part named '" .. destinationName .. "' in TeleportPoints")
+	end
+end)
+
