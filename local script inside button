@@ -1,0 +1,8 @@
+
+local button = script.Parent
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local teleportEvent = ReplicatedStorage:WaitForChild("TeleportRequest")
+
+button.MouseButton1Click:Connect(function()
+	teleportEvent:FireServer("TeleportPoint1") -- this is what the server needs
+end)
